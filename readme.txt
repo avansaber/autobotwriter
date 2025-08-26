@@ -3,7 +3,7 @@ Contributors: AvanSaber.com
 Tags: ai writer, blog generation, openai, content automation, gpt
 Requires at least: 5.8
 Tested up to: 6.4
-Stable tag: 1.6.0
+Stable tag: 1.8.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -26,8 +26,8 @@ AutoBotWriter Free is a powerful WordPress plugin that leverages OpenAI's advanc
 * GPT-3.5 Turbo
 * Legacy GPT-3 models
 
-**Modern Architecture:**
-Version 1.6.0 features a complete architectural overhaul with modern PHP practices, enhanced performance, comprehensive logging, and advanced caching systems.
+**Advanced Features & Templates:**
+Version 1.8.0 adds powerful content templates, bulk operations, enhanced scheduling, and comprehensive documentation system for professional content creation at scale.
 
 **Security First:**
 Built with security as a priority, featuring SQL injection prevention, CSRF protection, enhanced input validation, and comprehensive security monitoring.
@@ -79,6 +79,32 @@ Yes! The plugin includes a scheduling system that allows you to set specific pub
 
 == Changelog ==
 
+= 1.8.0 - 2024-12-19 =
+**ADVANCED FEATURES & DOCUMENTATION**
+* NEW: Content Templates System with 5 built-in professional templates
+* NEW: Bulk Operations Manager for generating multiple posts simultaneously
+* NEW: Enhanced Scheduling System with recurring content generation
+* NEW: Comprehensive Help and Documentation System
+* NEW: Template import/export and custom template creation
+* NEW: Advanced content sources (RSS feeds, trending topics, keywords)
+* NEW: Job queue management with progress tracking and cost estimation
+* NEW: Contextual help with searchable topics and troubleshooting guides
+* ENHANCED: Professional workflow management for content creators
+* MAINTAINED: Full backward compatibility with existing installations
+
+= 1.7.0 - 2024-12-19 =
+**MODERN UI & MULTI-AI SUPPORT**
+* NEW: Complete modern UI framework with responsive design and dark mode
+* NEW: Multi-AI provider support (OpenAI, Anthropic Claude, Google Gemini, Local AI)
+* NEW: Advanced content generation with variations and quality analysis
+* NEW: Modern dashboard with statistics and activity monitoring
+* NEW: Enhanced wizard interface with progress tracking
+* NEW: Real-time form validation and user feedback
+* NEW: Accessibility improvements and keyboard navigation
+* NEW: Mobile-responsive interface with touch-friendly controls
+* ENHANCED: Content creation workflow with better user experience
+* MAINTAINED: Full backward compatibility with existing installations
+
 = 1.6.0 - 2024-12-19 =
 **MAJOR ARCHITECTURE UPDATE**
 * NEW: Modern PHP architecture with PSR-4 autoloading and namespaces
@@ -109,6 +135,12 @@ Yes! The plugin includes a scheduling system that allows you to set specific pub
 * WordPress post creation and scheduling
 
 == Upgrade Notice ==
+
+= 1.8.0 =
+**ADVANCED FEATURES & DOCUMENTATION** - This version adds powerful content templates, bulk operations, enhanced scheduling, and comprehensive help system for professional content creation at scale. Fully backward compatible. Essential update for power users.
+
+= 1.7.0 =
+**MODERN UI & MULTI-AI SUPPORT** - This version introduces a stunning modern interface, support for multiple AI providers, advanced content generation features, and enhanced user experience. Fully backward compatible. Highly recommended update.
 
 = 1.6.0 =
 **MAJOR ARCHITECTURE UPDATE** - This version introduces modern PHP architecture, advanced caching, comprehensive logging, and performance optimizations. Fully backward compatible. Recommended for all users.
