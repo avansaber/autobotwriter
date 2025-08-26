@@ -3,7 +3,7 @@ Contributors: AvanSaber.com
 Tags: ai writer, blog generation, openai, content automation, gpt
 Requires at least: 5.8
 Tested up to: 6.4
-Stable tag: 1.5.0
+Stable tag: 1.6.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -26,8 +26,11 @@ AutoBotWriter Free is a powerful WordPress plugin that leverages OpenAI's advanc
 * GPT-3.5 Turbo
 * Legacy GPT-3 models
 
+**Modern Architecture:**
+Version 1.6.0 features a complete architectural overhaul with modern PHP practices, enhanced performance, comprehensive logging, and advanced caching systems.
+
 **Security First:**
-Version 1.5.0 includes comprehensive security enhancements with SQL injection prevention, CSRF protection, and enhanced input validation.
+Built with security as a priority, featuring SQL injection prevention, CSRF protection, enhanced input validation, and comprehensive security monitoring.
 
 == Installation ==
 
@@ -76,6 +79,19 @@ Yes! The plugin includes a scheduling system that allows you to set specific pub
 
 == Changelog ==
 
+= 1.6.0 - 2024-12-19 =
+**MAJOR ARCHITECTURE UPDATE**
+* NEW: Modern PHP architecture with PSR-4 autoloading and namespaces
+* NEW: Advanced caching system with object cache support
+* NEW: Comprehensive logging system with multiple log levels
+* NEW: Performance monitoring and optimization tools
+* NEW: Enhanced database layer with query optimization
+* NEW: Modern admin interface with template-based rendering
+* NEW: Advanced encryption utilities with WordPress integration
+* NEW: Content processor with improved workflow management
+* ENHANCED: Developer experience with modern coding patterns
+* MAINTAINED: Full backward compatibility with existing installations
+
 = 1.5.0 - 2024-12-19 =
 **SECURITY UPDATE - CRITICAL**
 * FIXED: SQL injection vulnerabilities in database queries
@@ -93,6 +109,9 @@ Yes! The plugin includes a scheduling system that allows you to set specific pub
 * WordPress post creation and scheduling
 
 == Upgrade Notice ==
+
+= 1.6.0 =
+**MAJOR ARCHITECTURE UPDATE** - This version introduces modern PHP architecture, advanced caching, comprehensive logging, and performance optimizations. Fully backward compatible. Recommended for all users.
 
 = 1.5.0 =
 **CRITICAL SECURITY UPDATE** - This version fixes multiple security vulnerabilities including SQL injection and CSRF attacks. All users must update immediately. Backup your site before updating.

@@ -2,30 +2,51 @@
 /**
  * Plugin Name: AutoBotWriter Free
  * Plugin URI:  https://autobotwriter.com
- * Description: WordPress plugin for generating and managing AI-powered blog posts.
- * Version:     1.5.0
+ * Description: WordPress plugin for generating and managing AI-powered blog posts with modern architecture and enhanced security.
+ * Version:     1.6.0
  * Author:      autobotwriter.com
  * Author URI:  https://www.avansaber.com
  * License:     GPL-2.0-or-later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain: auto-bot-writer
  * Domain Path: /languages
+ * Requires at least: 5.8
+ * Tested up to: 6.4
+ * Requires PHP: 7.4
+ * Network: false
  */
 
-
+// Prevent direct access
 if (!defined('ABSPATH')) {
-    exit;  
+    exit;
 }
 
-if(defined('AIBOT_VERSION')) return;
+// Prevent multiple initializations
+if (defined('AUTOBOTWRITER_VERSION')) {
+    return;
+}
 
-DEFINE('AIBOT_TEST',true);
-DEFINE('AIBOT_VERSION', '1.5.0');
-DEFINE('AIBOT_URL',plugin_dir_url(__FILE__));
+// Define plugin constants
+define('AUTOBOTWRITER_VERSION', '1.6.0');
+define('AUTOBOTWRITER_PLUGIN_FILE', __FILE__);
+define('AUTOBOTWRITER_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('AUTOBOTWRITER_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('AUTOBOTWRITER_TEXT_DOMAIN', 'auto-bot-writer');
 
-require_once 'includes/openai-class.php';
-require_once 'includes/ajax-class.php';
-require_once 'includes/admin-class.php';
+// Legacy constants for backward compatibility
+define('AIBOT_VERSION', AUTOBOTWRITER_VERSION);
+define('AIBOT_URL', AUTOBOTWRITER_PLUGIN_URL);
+
+// Load autoloader
+require_once AUTOBOTWRITER_PLUGIN_DIR . 'src/Core/Autoloader.php';
+
+// Register autoloader
+$autoloader = \AutoBotWriter\Core\Autoloader::register_autoloader(AUTOBOTWRITER_PLUGIN_DIR . 'src/');
+
+// Load legacy classes for backward compatibility
+require_once AUTOBOTWRITER_PLUGIN_DIR . 'includes/openai-class.php';
+require_once AUTOBOTWRITER_PLUGIN_DIR . 'includes/ajax-class.php';
+require_once AUTOBOTWRITER_PLUGIN_DIR . 'includes/admin-class.php';
 
 function ai_bot_writer_activate() {
     global $wpdb;
@@ -115,11 +136,48 @@ function ai_bot_writer_deactivate() {
 register_activation_hook(__FILE__, 'ai_bot_writer_activate');
 register_deactivation_hook(__FILE__, 'ai_bot_writer_deactivate');
 
-// Initialize the plugin
-if (class_exists('AIBotAdmin')) {
-    AIBotAdmin::start();
-} else {
-    add_action('admin_notices', function() {
-        echo '<div class="notice notice-error"><p>' . __('AutoBotWriter: Required classes not found. Please reinstall the plugin.', 'auto-bot-writer') . '</p></div>';
-    });
+/**
+ * Initialize the plugin
+ */
+function autobotwriter_init() {
+    try {
+        // Initialize modern plugin architecture
+        $plugin = \AutoBotWriter\Core\Plugin::get_instance(AUTOBOTWRITER_PLUGIN_FILE);
+        $plugin->init();
+
+        // Keep legacy initialization for backward compatibility
+        if (class_exists('AIBotAdmin')) {
+            AIBotAdmin::start();
+        }
+
+    } catch (\Exception $e) {
+        error_log('AutoBotWriter initialization failed: ' . $e->getMessage());
+        
+        add_action('admin_notices', function() use ($e) {
+            printf(
+                '<div class="notice notice-error"><p>%s</p></div>',
+                sprintf(
+                    /* translators: %s: error message */
+                    esc_html__('AutoBotWriter initialization failed: %s', AUTOBOTWRITER_TEXT_DOMAIN),
+                    esc_html($e->getMessage())
+                )
+            );
+        });
+    }
+}
+
+// Initialize plugin
+autobotwriter_init();
+
+/**
+ * Get plugin instance (for external access)
+ *
+ * @return \AutoBotWriter\Core\Plugin|null
+ */
+function autobotwriter() {
+    try {
+        return \AutoBotWriter\Core\Plugin::get_instance();
+    } catch (\Exception $e) {
+        return null;
+    }
 }
