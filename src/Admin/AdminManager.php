@@ -93,11 +93,19 @@ class AdminManager
         $plugin_url = $this->plugin->get_plugin_url();
         $version = Plugin::VERSION;
 
-        // Styles
+        // Modern UI Styles
+        wp_enqueue_style(
+            'autobotwriter-modern-ui',
+            $plugin_url . 'css/modern-ui.css',
+            [],
+            $version
+        );
+
+        // Legacy styles for backward compatibility
         wp_enqueue_style(
             'autobotwriter-admin',
             $plugin_url . 'css/autobotwriter.css',
-            [],
+            ['autobotwriter-modern-ui'],
             $version
         );
 
@@ -106,11 +114,20 @@ class AdminManager
         wp_enqueue_style('flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], $version);
         wp_enqueue_style('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', [], $version);
 
-        // Scripts
+        // Modern UI Scripts
+        wp_enqueue_script(
+            'autobotwriter-modern-ui',
+            $plugin_url . 'js/modern-ui.js',
+            ['jquery'],
+            $version,
+            true
+        );
+
+        // Legacy scripts for backward compatibility
         wp_enqueue_script(
             'autobotwriter-admin',
             $plugin_url . 'js/autobotwriter.js',
-            ['jquery'],
+            ['jquery', 'autobotwriter-modern-ui'],
             $version,
             true
         );
@@ -491,6 +508,45 @@ class AdminManager
     private function get_tags_for_js(): array
     {
         return get_tags(['hide_empty' => false]);
+    }
+
+    /**
+     * Get dashboard statistics
+     *
+     * @return array Dashboard statistics
+     */
+    public function get_dashboard_stats(): array
+    {
+        $current_month = date('Y-m');
+        $today = date('Y-m-d');
+
+        // Get post counts
+        $total_posts = $this->db_manager->get_post_schedules(1, 1)['total'];
+        $pending_posts = count($this->db_manager->get_pending_posts());
+        $this_month = (int) get_option("autobotwriter_gen_{$current_month}", 0);
+
+        // Calculate API usage percentage (assuming 5 posts per month limit for free)
+        $api_usage = min(100, ($this_month / 5) * 100);
+
+        // Get recent activity
+        $recent_posts = $this->db_manager->get_post_schedules(1, 5);
+        $recent_activity = [];
+
+        foreach ($recent_posts['posts'] as $post) {
+            $recent_activity[] = [
+                'title' => $post->post_title,
+                'status' => $post->status,
+                'time' => human_time_diff(strtotime($post->creation_date)) . ' ago'
+            ];
+        }
+
+        return [
+            'total_posts' => $total_posts,
+            'this_month' => $this_month,
+            'pending' => $pending_posts,
+            'api_usage' => round($api_usage),
+            'recent_activity' => $recent_activity
+        ];
     }
 
     /**
