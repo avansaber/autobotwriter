@@ -3,7 +3,7 @@
  * Plugin Name: AutoBotWriter Free
  * Plugin URI:  https://autobotwriter.com
  * Description: WordPress plugin for generating and managing AI-powered blog posts with modern architecture and enhanced security.
- * Version:     1.7.0
+ * Version:     1.8.0
  * Author:      autobotwriter.com
  * Author URI:  https://www.avansaber.com
  * License:     GPL-2.0-or-later
@@ -27,7 +27,7 @@ if (defined('AUTOBOTWRITER_VERSION')) {
 }
 
 // Define plugin constants
-define('AUTOBOTWRITER_VERSION', '1.7.0');
+define('AUTOBOTWRITER_VERSION', '1.8.0');
 define('AUTOBOTWRITER_PLUGIN_FILE', __FILE__);
 define('AUTOBOTWRITER_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AUTOBOTWRITER_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -106,6 +106,20 @@ function ai_bot_writer_activate() {
     
     if (empty($result)) {
         error_log('AutoBotWriter: Failed to create parameters table');
+    }
+    
+    // Initialize advanced features tables
+    try {
+        $template_manager = new \AutoBotWriter\Admin\TemplateManager();
+        $template_manager->create_templates_table();
+
+        $bulk_manager = new \AutoBotWriter\Admin\BulkOperationsManager();
+        $bulk_manager->create_jobs_table();
+
+        $scheduling_manager = new \AutoBotWriter\Admin\SchedulingManager();
+        $scheduling_manager->create_schedules_table();
+    } catch (Exception $e) {
+        error_log('AutoBotWriter: Failed to create advanced feature tables - ' . $e->getMessage());
     }
     
     // Set default options

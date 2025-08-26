@@ -3,7 +3,7 @@ Contributors: AvanSaber.com
 Tags: ai writer, blog generation, openai, content automation, gpt
 Requires at least: 5.8
 Tested up to: 6.4
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -26,8 +26,8 @@ AutoBotWriter Free is a powerful WordPress plugin that leverages OpenAI's advanc
 * GPT-3.5 Turbo
 * Legacy GPT-3 models
 
-**Modern UI & Multi-AI Support:**
-Version 1.7.0 introduces a stunning modern interface, support for multiple AI providers (OpenAI, Claude, Gemini, Local AI), and advanced content generation features.
+**Advanced Features & Templates:**
+Version 1.8.0 adds powerful content templates, bulk operations, enhanced scheduling, and comprehensive documentation system for professional content creation at scale.
 
 **Security First:**
 Built with security as a priority, featuring SQL injection prevention, CSRF protection, enhanced input validation, and comprehensive security monitoring.
@@ -79,6 +79,19 @@ Yes! The plugin includes a scheduling system that allows you to set specific pub
 
 == Changelog ==
 
+= 1.8.0 - 2024-12-19 =
+**ADVANCED FEATURES & DOCUMENTATION**
+* NEW: Content Templates System with 5 built-in professional templates
+* NEW: Bulk Operations Manager for generating multiple posts simultaneously
+* NEW: Enhanced Scheduling System with recurring content generation
+* NEW: Comprehensive Help and Documentation System
+* NEW: Template import/export and custom template creation
+* NEW: Advanced content sources (RSS feeds, trending topics, keywords)
+* NEW: Job queue management with progress tracking and cost estimation
+* NEW: Contextual help with searchable topics and troubleshooting guides
+* ENHANCED: Professional workflow management for content creators
+* MAINTAINED: Full backward compatibility with existing installations
+
 = 1.7.0 - 2024-12-19 =
 **MODERN UI & MULTI-AI SUPPORT**
 * NEW: Complete modern UI framework with responsive design and dark mode
@@ -122,6 +135,9 @@ Yes! The plugin includes a scheduling system that allows you to set specific pub
 * WordPress post creation and scheduling
 
 == Upgrade Notice ==
+
+= 1.8.0 =
+**ADVANCED FEATURES & DOCUMENTATION** - This version adds powerful content templates, bulk operations, enhanced scheduling, and comprehensive help system for professional content creation at scale. Fully backward compatible. Essential update for power users.
 
 = 1.7.0 =
 **MODERN UI & MULTI-AI SUPPORT** - This version introduces a stunning modern interface, support for multiple AI providers, advanced content generation features, and enhanced user experience. Fully backward compatible. Highly recommended update.

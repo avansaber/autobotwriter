@@ -5,6 +5,66 @@ All notable changes to AutoBotWriter will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2024-12-19
+
+### 🚀 Advanced Features & Documentation
+- **NEW**: Content Templates System with built-in templates (Blog Post, How-To, Review, News, Listicle)
+- **NEW**: Custom template creation and management with reusable structures
+- **NEW**: Bulk Operations Manager for generating multiple posts simultaneously
+- **NEW**: Enhanced Scheduling System with recurring content generation
+- **NEW**: Comprehensive Help and Documentation System with contextual help
+- **NEW**: Template import/export functionality for sharing and backup
+- **NEW**: Advanced content source options (RSS feeds, trending topics, keywords)
+
+### 📝 Content Templates
+- **NEW**: 5 built-in professional templates for different content types
+- **NEW**: Template usage tracking and analytics
+- **NEW**: Variable replacement system for dynamic content generation
+- **NEW**: Template categories and organization
+- **NEW**: Custom template builder with section-based structure
+- **NEW**: Template sharing and community features ready
+
+### 🔄 Bulk Operations
+- **NEW**: Batch content generation with progress tracking
+- **NEW**: Job queue management with status monitoring
+- **NEW**: Cost estimation and token usage tracking
+- **NEW**: Error handling and retry mechanisms
+- **NEW**: Bulk job statistics and reporting
+- **NEW**: Maximum batch size limits for stability
+
+### ⏰ Enhanced Scheduling
+- **NEW**: Recurring content schedules with flexible frequency options
+- **NEW**: Multiple content sources (manual, RSS, keywords, trending)
+- **NEW**: Custom cron expressions for advanced scheduling
+- **NEW**: Schedule monitoring and success/failure tracking
+- **NEW**: Automatic topic generation from various sources
+- **NEW**: WordPress cron integration with cleanup routines
+
+### 📚 Comprehensive Help System
+- **NEW**: Contextual help tabs on all admin pages
+- **NEW**: Searchable help topics with relevance scoring
+- **NEW**: Category-based help organization
+- **NEW**: Getting started guides and tutorials
+- **NEW**: Troubleshooting guides with step-by-step solutions
+- **NEW**: FAQ section with common questions and answers
+- **NEW**: Security best practices documentation
+
+### 🛠️ Developer & User Experience
+- **NEW**: Advanced error handling with detailed logging
+- **NEW**: Progress indicators for long-running operations
+- **NEW**: Real-time status updates and notifications
+- **NEW**: Enhanced admin interface with better organization
+- **NEW**: Improved workflow management and user guidance
+- **NEW**: Performance optimizations for large-scale operations
+
+### 🔧 Technical Improvements
+- **NEW**: Database schema for templates, bulk jobs, and schedules
+- **NEW**: Advanced caching strategies for better performance
+- **NEW**: Improved error recovery and resilience
+- **NEW**: Enhanced security with proper capability checks
+- **NEW**: Better resource management and cleanup routines
+- **NEW**: Extensible architecture for future enhancements
+
 ## [1.7.0] - 2024-12-19
 
 ### 🎨 Modern UI/UX Framework
