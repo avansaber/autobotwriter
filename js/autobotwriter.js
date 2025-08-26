@@ -28,7 +28,10 @@ $('#broaddescription').keyup(function() {
                 $.ajax({
                     url:aibot.ajaxurl,
                     method:'POST',
-                    data:{action:'aibot_heartbeat'},
+                    data:{
+                        action:'aibot_heartbeat',
+                        nonce: aibot.nonces.heartbeat
+                    },
                     success:function(){
                         setTimeout(heartbeat,5000);
                     },
@@ -93,9 +96,12 @@ async function getTitles(){
     var r = await $.ajax({
                     url: aibot.ajaxurl,
                     method:'POST',
-                    data:{action:'aibot_get_titles',
-                            broaddescription:$('#broaddescription').val(),
-                            numberofposts:$('#numberofposts').val()},
+                    data:{
+                        action:'aibot_get_titles',
+                        broaddescription:$('#broaddescription').val(),
+                        numberofposts:$('#numberofposts').val(),
+                        nonce: aibot.nonces.get_titles
+                    },
                      
 
             });
@@ -109,9 +115,12 @@ async function submitWizardData(data){
     var r = await $.ajax({
                     url: aibot.ajaxurl,
                     method:'POST',
-                    data:{action:'aibot_schedule_posts',
-                            parameters:data,
-                            broaddescription:$('#broaddescription').val()}
+                    data:{
+                        action:'aibot_schedule_posts',
+                        parameters:data,
+                        broaddescription:$('#broaddescription').val(),
+                        nonce: aibot.nonces.schedule_posts
+                    }
             });
     $('#spinning').css('display','none');
     if(r.indexOf('OK')!==-1){
@@ -359,7 +368,11 @@ $('#openai_api_key').on('change',function(e){
         $.ajax({
             url: aibot.ajaxurl,
             method:'POST',
-            data:{action:'aibot_validate_openai_key',key:$(this).val()},
+            data:{
+                action:'aibot_validate_openai_key',
+                key:$(this).val(),
+                nonce: aibot.nonces.validate_key
+            },
             success:function(data){
                 data = JSON.parse(data);
                 if(data && data.data!=undefined){
@@ -398,12 +411,15 @@ $('#openai_api_key').on('change',function(e){
         $.ajax({
             url: aibot.ajaxurl,
             method:'POST',
-            data:{action:'aibot_save_settings',
-                    openai_api_key:$('#openai_api_key').val(),
-                    tokens:$('#openai_tokens').val(),
-                    headings:$('#openai_headings').val(),
-                    temperature:$('#openai_temperature').val(),
-                    ai_bot_writer_preferred_model:$('#ai_bot_writer_preferred_model').val()},
+            data:{
+                action:'aibot_save_settings',
+                openai_api_key:$('#openai_api_key').val(),
+                tokens:$('#openai_tokens').val(),
+                headings:$('#openai_headings').val(),
+                temperature:$('#openai_temperature').val(),
+                ai_bot_writer_preferred_model:$('#ai_bot_writer_preferred_model').val(),
+                nonce: aibot.nonces.save_settings
+            },
             success:function(data){
                 if(data.indexOf('OK')!=-1){
                     $('#plugin-settings-form .feedback > *').css('display','none');

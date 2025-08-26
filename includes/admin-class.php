@@ -34,6 +34,14 @@ class AIBotAdmin{
             ),
             'tags' => $tags = get_tags(array( 'hide_empty' => false )),
             'categories' => $tags = get_categories(array( 'hide_empty' => false )),
+            'nonces' => array(
+                'schedule_posts' => wp_create_nonce('aibot_schedule_posts'),
+                'get_titles' => wp_create_nonce('aibot_get_titles'),
+                'validate_key' => wp_create_nonce('aibot_validate_key'),
+                'save_settings' => wp_create_nonce('aibot_save_settings'),
+                'heartbeat' => wp_create_nonce('aibot_heartbeat'),
+                'erase_all' => wp_create_nonce('aibot_erase_all'),
+            )
         ));
     }
 
@@ -57,7 +65,7 @@ class AIBotAdmin{
     function ai_bot_writer_render_menu_page() {
         global $wpdb;
         $table_name = $wpdb->prefix . 'autobotwriter_posts_schedule';
-        $results = $wpdb->get_results("SELECT * FROM $table_name WHERE status<>'deleted' ORDER BY ID DESC");
+        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM %i WHERE status != %s ORDER BY ID DESC", $table_name, 'deleted'));
         $options = OpenAi::getSettings();
 
         $autobotwriter_email = get_option('autobotwriter_email','');
@@ -97,17 +105,26 @@ class AIBotAdmin{
         $autobotwriter_posts_schedule_table = $wpdb->prefix . 'autobotwriter_posts_schedule';
 
         if(isset($_GET['eraseall'])){
+            // Security: Check nonce and user capabilities
+            if (!current_user_can('manage_options')) {
+                wp_die(__('You do not have sufficient permissions to access this page.', 'auto-bot-writer'));
+            }
+            
+            if (!wp_verify_nonce($_GET['_wpnonce'], 'aibot_erase_all')) {
+                wp_die(__('Security check failed.', 'auto-bot-writer'));
+            }
+
             // Delete posts linked with autobotwriter_posts_schedule records
-            $post_ids = $wpdb->get_col("SELECT post_id FROM $autobotwriter_posts_schedule_table");
+            $post_ids = $wpdb->get_col($wpdb->prepare("SELECT post_id FROM %i", $autobotwriter_posts_schedule_table));
             if (!empty($post_ids)) {
-                $post_ids_str = implode(', ', $post_ids);
-                $wpdb->query("DELETE FROM $wpdb->posts WHERE ID IN ($post_ids_str)");
+                $post_ids_placeholders = implode(',', array_fill(0, count($post_ids), '%d'));
+                $wpdb->query($wpdb->prepare("DELETE FROM $wpdb->posts WHERE ID IN ($post_ids_placeholders)", ...$post_ids));
             }
 
             // Delete autobotwriter_posts_schedule records
-            $wpdb->query("DELETE FROM $autobotwriter_posts_schedule_table WHERE 1");
+            $wpdb->query($wpdb->prepare("DELETE FROM %i WHERE 1", $autobotwriter_posts_schedule_table));
 
-            die('All records deleted.');
+            wp_die(__('All records deleted successfully.', 'auto-bot-writer'));
         }
     }
 
@@ -119,7 +136,9 @@ class AIBotAdmin{
         $wpdb->update(
             $autobotwriter_posts_schedule_table,
             ['status' => 'deleted'],
-            ['post_id' => $id]
+            ['post_id' => intval($id)],
+            ['%s'],
+            ['%d']
         );
     }
 

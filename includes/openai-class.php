@@ -123,7 +123,7 @@ class OpenAi
 
         $autobotwriter_parameters_table = $wpdb->prefix . 'autobotwriter_parameters';
 
-        $settings = $wpdb->get_row("SELECT * FROM $autobotwriter_parameters_table;", ARRAY_A);
+        $settings = $wpdb->get_row($wpdb->prepare("SELECT * FROM %i LIMIT 1", $autobotwriter_parameters_table), ARRAY_A);
 
         if (!$settings) {
             return [
@@ -141,12 +141,17 @@ class OpenAi
 
     private static function decrypt($string)
     {
+        if (empty($string)) {
+            return '';
+        }
+        
         $ciphering_value = "AES-128-CTR";
-        $s = "AIBOTWriter2023";
+        $key = hash('sha256', SECURE_AUTH_KEY . 'AIBOTWriter2023');
         $options = 0;
         $iv = '1234567891011121';
-        $value = openssl_decrypt($string, $ciphering_value, $s, $options, $iv);
-        return $value;
+        
+        $value = openssl_decrypt($string, $ciphering_value, $key, $options, $iv);
+        return $value !== false ? $value : '';
     }
 
     private static function atbtopenai_chat($opts)
@@ -430,11 +435,13 @@ class OpenAi
 
         $autobotwriter_posts_schedule_table = $wpdb->prefix . 'autobotwriter_posts_schedule';
 
-        $query = "SELECT id FROM $autobotwriter_posts_schedule_table WHERE status = 'pending' ORDER BY creation_date DESC, id ASC";
+        $article_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM %i WHERE status = %s ORDER BY creation_date DESC, id ASC LIMIT 1",
+            $autobotwriter_posts_schedule_table,
+            'pending'
+        ));
 
-        $article_id = $wpdb->get_var($query);
-
-        return $article_id ? $article_id : NULL;
+        return $article_id ? intval($article_id) : null;
     }
 
     public static function getArticleTitle($id)
@@ -443,11 +450,13 @@ class OpenAi
 
         $autobotwriter_posts_schedule_table = $wpdb->prefix . 'autobotwriter_posts_schedule';
 
-        $query = $wpdb->prepare("SELECT post_title FROM $autobotwriter_posts_schedule_table WHERE id = %d", $id);
+        $article_title = $wpdb->get_var($wpdb->prepare(
+            "SELECT post_title FROM %i WHERE id = %d",
+            $autobotwriter_posts_schedule_table,
+            intval($id)
+        ));
 
-        $article_title = $wpdb->get_var($query);
-
-        return $article_title ? $article_title : NULL;
+        return $article_title ? sanitize_text_field($article_title) : null;
     }
 
     public static function getArticleRecord($id)
@@ -456,11 +465,13 @@ class OpenAi
 
         $autobotwriter_posts_schedule_table = $wpdb->prefix . 'autobotwriter_posts_schedule';
 
-        $query = $wpdb->prepare("SELECT include_keywords, exclude_keywords FROM $autobotwriter_posts_schedule_table WHERE id = %d", $id);
+        $article_record = $wpdb->get_row($wpdb->prepare(
+            "SELECT include_keywords, exclude_keywords FROM %i WHERE id = %d",
+            $autobotwriter_posts_schedule_table,
+            intval($id)
+        ));
 
-        $article_record = $wpdb->get_row($query);
-
-        return $article_record ? $article_record : NULL;
+        return $article_record ? $article_record : null;
     }
 
     public static function generate_intro($prompt, $include = '', $exclude = '')
@@ -638,26 +649,50 @@ class OpenAi
 
         $autobotwriter_posts_schedule_table = $wpdb->prefix . 'autobotwriter_posts_schedule';
 
-        $record = $wpdb->get_row($wpdb->prepare("SELECT * FROM $autobotwriter_posts_schedule_table WHERE id = %d", $id));
+        $record = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM %i WHERE id = %d",
+            $autobotwriter_posts_schedule_table,
+            intval($id)
+        ));
 
-        if (!$record || trim($title) === '') {
-            return;
+        if (!$record || empty(trim($title))) {
+            return false;
         }
+
+        // Sanitize inputs
+        $title = sanitize_text_field($title);
+        $content = wp_kses_post($content);
+        $author_id = intval($record->author_id);
+        $category_id = intval($record->category);
 
         $status = $record->creation_date === '0000-00-00 00:00:00' ? 'publish' : 'draft';
 
-        $post_id = wp_insert_post(array(
+        $post_data = array(
             'post_type' => 'post',
-            'post_author' => $record->author_id,
+            'post_author' => $author_id,
             'post_title' => $title,
             'post_content' => $content,
             'post_status' => $status,
             'post_date' => $record->publish_date,
-        ));
+        );
+
+        $post_id = wp_insert_post($post_data);
+
+        if (is_wp_error($post_id)) {
+            error_log('AutoBotWriter: Failed to create post - ' . $post_id->get_error_message());
+            return false;
+        }
 
         if ($post_id) {
-            wp_set_post_categories($post_id, array($record->category));
-            wp_set_post_tags($post_id, explode(',', $record->tags));
+            // Set categories and tags
+            if ($category_id > 0) {
+                wp_set_post_categories($post_id, array($category_id));
+            }
+            
+            if (!empty($record->tags)) {
+                $tags = array_map('trim', explode(',', $record->tags));
+                wp_set_post_tags($post_id, $tags);
+            }
 
             $now = current_datetime();
             $wpdb->update(
@@ -667,14 +702,19 @@ class OpenAi
                     'update_date' => $now->format('Y-m-d H:i:s'),
                     'post_id' => $post_id,
                 ),
-                array('id' => $id)
+                array('id' => intval($id)),
+                array('%s', '%s', '%d'),
+                array('%d')
             );
         }
 
-        list($y,$m) = explode('-', date('Y-m'));
-        $option_index = 'autobotwriter_gen_'.$m.'-'.$y;
-        $opt = get_option($option_index,0);
-        update_option($option_index,$opt+1);
+        // Update generation counter
+        list($y, $m) = explode('-', date('Y-m'));
+        $option_index = 'autobotwriter_gen_' . $m . '-' . $y;
+        $opt = get_option($option_index, 0);
+        update_option($option_index, intval($opt) + 1);
+        
+        return $post_id;
     }
 
     public static function setSettings($key, $selected_model, $tokens, $temperature, $headings)
@@ -683,43 +723,58 @@ class OpenAi
 
         $autobotwriter_parameters_table = $wpdb->prefix . 'autobotwriter_parameters';
 
-        $settings = $wpdb->get_row("SELECT * FROM $autobotwriter_parameters_table;");
+        $settings = $wpdb->get_row($wpdb->prepare("SELECT * FROM %i LIMIT 1", $autobotwriter_parameters_table));
         $encrypted_key = self::encrypt($key);
 
+        // Sanitize inputs
+        $selected_model = sanitize_text_field($selected_model);
+        $tokens = intval($tokens);
+        $temperature = floatval($temperature);
+        $headings = intval($headings);
+
+        $data = array(
+            'openai_api_key' => $encrypted_key,
+            'selected_model' => $selected_model,
+            'tokens' => $tokens,
+            'temperature' => $temperature,
+            'headings' => $headings,
+        );
+
+        $format = array('%s', '%s', '%d', '%f', '%d');
+
         if (!$settings) {
-            $wpdb->insert(
-                $autobotwriter_parameters_table,
-                array(
-                    'openai_api_key' => $encrypted_key,
-                    'selected_model' => $selected_model,
-                    'tokens' => $tokens,
-                    'temperature' => $temperature,
-                    'headings' => $headings,
-                )
-            );
+            $result = $wpdb->insert($autobotwriter_parameters_table, $data, $format);
         } else {
-            $wpdb->update(
+            $result = $wpdb->update(
                 $autobotwriter_parameters_table,
-                array(
-                    'openai_api_key' => $encrypted_key,
-                    'selected_model' => $selected_model,
-                    'tokens' => $tokens,
-                    'temperature' => $temperature,
-                    'headings' => $headings,
-                ),
-                array('id' => $settings->id) // Add your WHERE condition based on a unique identifier
+                $data,
+                array('id' => intval($settings->id)),
+                $format,
+                array('%d')
             );
         }
+
+        if ($result === false) {
+            error_log('AutoBotWriter: Failed to save settings');
+            throw new Exception('Failed to save settings');
+        }
+
+        return $result;
     }
 
     private static function encrypt($string)
     {
+        if (empty($string)) {
+            return '';
+        }
+        
         $ciphering_value = "AES-128-CTR";
-        $s = "AIBOTWriter2023";
+        $key = hash('sha256', SECURE_AUTH_KEY . 'AIBOTWriter2023');
         $options = 0;
         $iv = '1234567891011121';
-        $encryption_value = openssl_encrypt($string, $ciphering_value, $s, $options, $iv);
-        return $encryption_value;
+        
+        $encryption_value = openssl_encrypt($string, $ciphering_value, $key, $options, $iv);
+        return $encryption_value !== false ? $encryption_value : '';
     }
 }
 
